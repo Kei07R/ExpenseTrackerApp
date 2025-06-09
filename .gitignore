@@ -1,0 +1,109 @@
+# ================================================================= #
+#                           Global Ignores                          #
+# ================================================================= #
+
+# Operating System files
+.DS_Store               # macOS
+Thumbs.db              # Windows
+.AppleDouble
+.LSOverride
+
+# IDE settings (optional if shared)
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# NPM/Yarn cache
+.npm/
+.yarn/
+.pnpm-debug.log*
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# ================================================================= #
+#                       Backend (Node.js/Express)                  #
+# ================================================================= #
+
+# Node modules
+backend/node_modules/
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+prisma/migrations/
+
+# Generated static assets and logs
+backend/public/build/
+backend/logs/
+
+# ================================================================= #
+#                   Frontend (React Native + Expo)                 #
+# ================================================================= #
+
+# Node modules
+frontend/node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+frontend/.expo/
+frontend/.expo-shared/
+web-build/                # Output of 'expo build:web'
+
+# Metro Bundler cache
+metro-cache/
+
+# Watchman
+.watchmanconfig
+
+# ================================================================= #
+#                          Android Specific                        #
+# ================================================================= #
+
+android/.gradle/
+android/build/
+android/gradle/
+android/app/build/
+android/app/.idea/
+android/app/src/main/assets/  # Bundled assets
+
+*.apk
+*.aab
+
+# ================================================================= #
+#                            iOS Specific                          #
+# ================================================================= #
+
+ios/build/
+ios/Pods/
+ios/.symlinks/
+ios/DerivedData/
+ios/xcuserdata/
+
+*.ipa
+ios/*.xcworkspace
+ios/*.xcscheme
+
+# ================================================================= #
+#                      Sensitive Keys & Credentials                #
+# ================================================================= #
+
+*.keystore
+*.jks
+*.p12
+*.p8
+*.mobileprovision
+upload-keys.json
