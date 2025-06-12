@@ -1,14 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const { clerkMiddleware, requireAuth } = require("@clerk/express");
+
 const expenseRoutes = require("./src/routes/expense.routes");
 
 const app = express();
 
+app.use(clerkMiddleware());
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/expense", expenseRoutes);
+app.use("/api/expense", requireAuth(), expenseRoutes);
 
 const PORT = process.env.PORT || 5000;
 

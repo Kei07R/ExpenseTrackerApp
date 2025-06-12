@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const { z } = require("zod");
 const EC = require("../utils/errorMessages");
+const { getAuth } = require("@clerk/express");
 
 const prisma = new PrismaClient();
 
@@ -9,11 +10,17 @@ const addExpenseSchema = z.object({
   note: z.string().optional(),
   tagId: z.string().optional(),
   expenseDate: z.coerce.date({ invalid_type_error: "Invalid date format" }),
-  userId: z.string({ invalid_type_error: "User Id is required" }),
 });
 
 const addExpense = async (req, res) => {
   try {
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res
+        .status(EC.UNAUTHORIZED.statusCode)
+        .json({ message: EC.UNAUTHORIZED.message });
+    }
+
     const parsed = addExpenseSchema.safeParse(req.body);
 
     if (!parsed.success) {
@@ -22,7 +29,7 @@ const addExpense = async (req, res) => {
         .json({ message: EC.VALIDATION_FAILED.message });
     }
 
-    const { amount, note, tagId, expenseDate, userId } = parsed.data;
+    const { amount, note, tagId, expenseDate } = parsed.data;
 
     const expense = await prisma.expense.create({
       data: {
@@ -43,7 +50,7 @@ const addExpense = async (req, res) => {
 };
 
 const getExpense = (req, res) => {
-  console.log("Get Expense Working");
+    
 };
 
 const scanExpense = (req, res) => {
