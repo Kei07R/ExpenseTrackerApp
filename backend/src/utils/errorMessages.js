@@ -1,4 +1,4 @@
-const ERROR_CODES = {
+const EC = {
   VALIDATION_FAILED: {
     statusCode: 400,
     message: "Validation failed",
@@ -31,4 +31,4 @@ const ERROR_CODES = {
   },
 };
 
-module.exports = ERROR_CODES;
+module.exports = EC;
