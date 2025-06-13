@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const { z } = require("zod");
 const EC = require("../utils/errorMessages");
 const { getAuth } = require("@clerk/express");
+const { get } = require("../routes/expense.routes");
 
 const prisma = new PrismaClient();
 
@@ -161,8 +162,38 @@ const updateExpense = async (req, res) => {
   }
 };
 
-const deleteExpense = (req, res) => {
-  console.log("Delete Expense Working");
+const deleteExpense = async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res
+        .status(EC.UNAUTHORIZED.statusCode)
+        .json({ message: EC.UNAUTHORIZED.message });
+    }
+
+    const { id } = req.params;
+    const existing = await prisma.expense.findUnique({
+      where: { id },
+    });
+
+    if (!existing || existing.userId !== userId) {
+      return res
+        .status(EC.NOT_FOUND.statusCode)
+        .json({ message: EC.NOT_FOUND.message });
+    }
+
+    await prisma.expense.delete({
+      where: {
+        id,
+      },
+    });
+    return res.status(200).json({ message: "Expense Deleted" });
+  } catch (error) {
+    return res.status(EC.INTERNAL_SERVER_ERROR.statusCode).json({
+      message: EC.INTERNAL_SERVER_ERROR.message,
+      error,
+    });
+  }
 };
 
 module.exports = {
