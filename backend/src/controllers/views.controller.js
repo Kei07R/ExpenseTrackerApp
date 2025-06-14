@@ -62,18 +62,20 @@ const viewOtherDay = async (req, res) => {
     const { date } = req.query;
 
     if (!date) {
-      return res
-        .status(400)
-        .json({
-          message: "Missing required 'date' query parameter (YYYY-MM-DD).",
-        });
+      return res.status(400).json({
+        message: "Missing required 'date' query parameter (YYYY-MM-DD).",
+      });
     }
 
     const selectedDate = new Date(date);
+
     if (isNaN(selectedDate.getTime())) {
       return res
         .status(400)
         .json({ message: "Invalid date format. Expected YYYY-MM-DD." });
+    }
+    if (selectedDate > new Date()) {
+      return res.status(400).json({ message: "Cannot select a future date." });
     }
 
     const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
@@ -94,7 +96,7 @@ const viewOtherDay = async (req, res) => {
     const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 
     return res.status(200).json({
-      date,
+      date: new Date(date).toISOString().split("T")[0],
       total,
       expenses,
     });
