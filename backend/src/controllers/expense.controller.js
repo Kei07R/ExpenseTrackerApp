@@ -2,7 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const { z } = require("zod");
 const EC = require("../utils/errorMessages");
 const { getAuth } = require("@clerk/express");
-const { get } = require("../routes/expense.routes");
 
 const prisma = new PrismaClient();
 
