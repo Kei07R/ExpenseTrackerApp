@@ -50,7 +50,7 @@ const viewProfile = async (req, res) => {
   }
 };
 
-const viewSummary = async (req, res) => {
+const viewOtherDay = async (req, res) => {
   try {
     const { userId } = getAuth(req);
     if (!userId) {
@@ -59,41 +59,45 @@ const viewSummary = async (req, res) => {
         .json({ message: EC.UNAUTHORIZED.message });
     }
 
-    const weeks = parseInt(req.query.weeks || "4", 10);
-    const now = new Date();
+    const { date } = req.query;
 
-    const startDate = new Date();
-    startDate.setDate(now.getDate() - weeks * 7);
-    startDate.setHours(0, 0, 0, 0);
+    if (!date) {
+      return res
+        .status(400)
+        .json({
+          message: "Missing required 'date' query parameter (YYYY-MM-DD).",
+        });
+    }
 
-    const allExpenses = await prisma.expense.findMany({
+    const selectedDate = new Date(date);
+    if (isNaN(selectedDate.getTime())) {
+      return res
+        .status(400)
+        .json({ message: "Invalid date format. Expected YYYY-MM-DD." });
+    }
+
+    const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
+
+    const expenses = await prisma.expense.findMany({
       where: {
         userId,
         expenseDate: {
-          gte: startDate,
-          lte: now,
+          gte: startOfDay,
+          lte: endOfDay,
         },
       },
+      orderBy: { expenseDate: "desc" },
+      include: { tag: true },
     });
 
-    const summary = {};
+    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-    for (const expense of allExpenses) {
-      const date = new Date(expense.expenseDate);
-      const week = `${date.getFullYear()}-W${Math.ceil(
-        (date.getDate() + 1 - date.getDay()) / 7
-      )}`;
-
-      if (!summary[week]) summary[week] = 0;
-      summary[week] += expense.amount;
-    }
-
-    const result = Object.entries(summary).map(([week, total]) => ({
-      week,
-      total: Number(total.toFixed(2)),
-    }));
-
-    return res.status(200).json(result);
+    return res.status(200).json({
+      date,
+      total,
+      expenses,
+    });
   } catch (error) {
     return res.status(EC.INTERNAL_SERVER_ERROR.statusCode).json({
       message: EC.INTERNAL_SERVER_ERROR.message,
@@ -102,4 +106,4 @@ const viewSummary = async (req, res) => {
   }
 };
 
-module.exports = { viewProfile, viewSummary };
+module.exports = { viewProfile, viewOtherDay };
